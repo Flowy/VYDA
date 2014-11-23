@@ -1,0 +1,61 @@
+<form>
+    <table>
+        <tr>
+            <td>
+                <label for="zkratka">zkratka</label>
+            </td>
+            <td>
+                <input id="zkratka" name="zkratka" type="text" value="" maxlength="5" required="true"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="nazov">nazov</label>
+            </td>
+            <td>
+                <input id="nazov" name="nazov" type="text" value="" maxlength="50"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="rozsah_prednasek">rozsah prednasek</label>
+            </td>
+            <td>
+                <input id="rozsah_prednasek" name="rozsah_prednasek" type="number" max="32,767" min="-32,768"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="rozsah_cviceni">rozsah cviceni</label>
+            </td>
+            <td>
+                <input id="rozsah_cviceni" name="rozsah_cviceni" type="number" max="32,767" min="-32,768"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="pocet_kreditu">pocet kreditu</label>
+            </td>
+            <td>
+                <input id="pocet_kreditu" name="pocet_kreditu" type="number" max="32,767" min="-32,768"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="ukonceni">ukonceni</label>
+            </td>
+            <td>
+                <input id="ukonceni" name="ukonceni" type="text" value="" maxlength="1"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="popis">popis</label>
+            </td>
+            <td>
+                <textarea id="popis" name="popis" maxlength="65536"></textarea>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Ulozit"/>
+</form>

@@ -1,0 +1,53 @@
+<form>
+    <table>
+        <tr>
+            <td>
+                <label for="warehouse">In warehouse:</label>
+            </td>
+            <td>
+                <input id="warehouse" type="checkbox" name="warehouse"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="producer1">Select producer:</label>
+            </td>
+            <td>
+                <label for="producer1">AMD</label>
+                <input type="radio" name="producer" id="producer1" value="AMD" checked/>
+                <label for="producer2">Intel</label>
+                <input type="radio" name="producer" id="producer2" value="Intel"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="minPrice">Minimum price:</label>
+            </td>
+            <td>
+                <input type="number" name="minPrice" id="minPrice" value="100" step="50"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="platform">Platform:</label>
+            </td>
+            <td>
+                <select id="platform" name="platform">
+                    <option value="socketAM1">Socket AM1</option>
+                    <option value="socketAM3">Socket AM3</option>
+                    <option value="socket1150">Socket 1150</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="cores">Number of cores:</label>
+            </td>
+            <td>
+                <input id="cores" name="cores" type="number" min="1" max="4" value="1"/>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" name="Submit"/>
+
+</form>
