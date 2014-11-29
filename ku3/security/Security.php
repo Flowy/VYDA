@@ -9,44 +9,61 @@ require_once 'Authentication.php';
 require_once 'AuthenticationProvider.php';
 require_once 'DatabaseAuthProvider.php';
 
-define('AUTH_SESSION_PARAM', 'auth');
-define('ORIGIN_PATH_SESSION_PARAM', 'originPath');
+session_start();
 
-include_once '../dbconfig.php';
+$root = realpath($_SERVER["DOCUMENT_ROOT"]);
+include "$root/VYDA/ku3/dbconfig.php";
 include_once 'roles.php';
 
-class Security {
+final class Security {
 
-    private static $authProviders;
+    private static $instance;
 
-    private static function initProviders() {
-        self::$authProviders = array();
+    private $authProviders;
+    private $AUTH_SESSION_PARAM;
+    private $ORIGIN_PATH_SESSION_PARAM;
+
+    public function Security($authParam, $pathParam) {
+        $this->AUTH_SESSION_PARAM = $authParam;
+        $this->ORIGIN_PATH_SESSION_PARAM = $pathParam;
+        $this->initProviders();
+    }
+
+    public static function getInstance() {
+        if (!isset(self::$instance)) {
+            self::$instance = new Security('auth', 'originPath');
+        }
+        return self::$instance;
+    }
+
+    private function initProviders() {
+        $this->authProviders = array();
 
         $studentiConf = new DbAuthProviderConfig(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
         $studentiConf->setTable('Studenti')->setLoginColumn('kod_studenta')->setPasswordColumn('heslo');
-        self::$authProviders[] = new DatabaseAuthProvider($studentiConf, ROLE_STUDENT);
+        $this->authProviders[] = new DatabaseAuthProvider($studentiConf, ROLE_STUDENT);
 
         $profesoriConf = new DbAuthProviderConfig(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
         $profesoriConf->setTable('Pedagogove')->setLoginColumn('kod_pedagoga')->setPasswordColumn('heslo');
-        self::$authProviders[] = new DatabaseAuthProvider($profesoriConf, ROLE_PROFESOR);
+        $this->authProviders[] = new DatabaseAuthProvider($profesoriConf, ROLE_PROFESOR);
     }
 
-    public static function requireRole($role) {
-        if (!isset($_SESSION[AUTH_SESSION_PARAM])) {
-            self::requireLogin();
-        } else if (!($_SESSION[AUTH_SESSION_PARAM] instanceof Authentication) || !$_SESSION[AUTH_SESSION_PARAM]->hasRole($role)) {
-            self::accessDenied();
+    public function requireRole($role) {
+        $auth = $_SESSION[$this->AUTH_SESSION_PARAM];
+        if (!isset($auth)) {
+            $this->requireLogin();
+        } else if (!($auth instanceof Authentication)) {
+            $this->accessDenied('authentication broken, saved auth object is of class: ' . get_class($auth));
+        } else if (!$auth->hasRole($role)) {
+            $this->accessDenied('not allowed for role ' . $role);
         } else {
             return true;
         }
     }
 
-    public static function login($username, $password) {
-        if (!isset(self::$authProviders)) {
-            self::initProviders();
-        }
+    public function login($username, $password) {
         $auth = null;
-        foreach (self::$authProviders as &$authProvider) {
+        foreach ($this->authProviders as &$authProvider) {
             if ($authProvider instanceof AuthenticationProvider) {
                 $auth = $authProvider->authenticate($username, $password);
                 if ($auth) {
@@ -55,21 +72,25 @@ class Security {
             }
         }
         if (is_null($auth)) {
-            self::accessDenied();
+            $this->accessDenied('invalid credentials');
         } else {
-            $_SESSION[AUTH_SESSION_PARAM] = $auth;
-            header('Location: ' . $_SESSION[ORIGIN_PATH_SESSION_PARAM]);
-            die();
+            $_SESSION[$this->AUTH_SESSION_PARAM] = $auth;
+            if (isset($_SESSION[$this->ORIGIN_PATH_SESSION_PARAM])) {
+                header('Location: ' . $_SESSION[$this->ORIGIN_PATH_SESSION_PARAM]);
+                die();
+            } else {
+                die('parameter: ' . $this->ORIGIN_PATH_SESSION_PARAM . ' does not exists');
+            }
         }
     }
 
-    private static function requireLogin() {
-        $_SESSION[ORIGIN_PATH_SESSION_PARAM] = $_SERVER['REQUEST_URI'];
+    private function requireLogin() {
+        $_SESSION[$this->ORIGIN_PATH_SESSION_PARAM] = $_SERVER['REQUEST_URI'];
         header("Location: security/login.html");
         die();
     }
 
-    public static function accessDenied($message = null) {
+    public function accessDenied($message = null) {
         header("HTTP/1.1 403 Forbidden");
         $response = 'Access Forbidden';
         if ($message) {

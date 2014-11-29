@@ -6,7 +6,15 @@
  * Time: 14:32
  */
 require_once 'security/Security.php';
-require_once 'security/roles.php';
-session_start();
-
-Security::requireRole('user');
+?>
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<a href="profesor.php">Sprava pre profesorov</a><br />
+<a href="student.php">Sprava pre studentov</a>
+</body>
+</html>

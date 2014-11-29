@@ -8,7 +8,7 @@
 require_once 'Security.php';
 
 if (isset($_POST['login']) && isset($_POST['password'])) {
-    Security::login($_POST['login'], $_POST['password']);
+    Security::getInstance()->login($_POST['login'], $_POST['password']);
 } else {
-    Security::accessDenied('Credentials not provided');
+    Security::getInstance()->accessDenied('Credentials not provided');
 }

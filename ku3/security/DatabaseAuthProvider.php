@@ -34,18 +34,18 @@ class DatabaseAuthProvider implements AuthenticationProvider {
         if ($connection->errno) {
             die('Connection to database failed: ' . $connection->error);
         }
-        $statement = $connection->prepare('SELECT ' . $this->dbConfig->getLoginColumn() . ', ' . $this->dbConfig->getPasswordColumn()
+        $queryString =
+            'SELECT ' . $this->dbConfig->getLoginColumn() . ', ' . $this->dbConfig->getPasswordColumn()
             . ' FROM ' . $this->dbConfig->getTable()
-            . ' WHERE ' . $this->dbConfig->getLoginColumn() . ' = ?');
-        if ($statement->errno) {
-            die('Statement prepare failed: ' . $statement->error);
+            . ' WHERE ' . $this->dbConfig->getLoginColumn() . ' = \'' . $login . '\'';
+        $queryResult = mysqli_query($connection, $queryString);
+        if ($queryResult) {
+            $result = mysqli_fetch_assoc($queryResult);
+        } else {
+            $result = false;
         }
-        $statement->bind_param('s', $login);
-
-        $queryResult = $statement->execute();
-
+        $queryResult->close();
         $connection->close();
-        $statement->close();
-        return $queryResult->fetch_assoc();
+        return $result;
     }
 }

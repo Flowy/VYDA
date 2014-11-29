@@ -7,6 +7,5 @@
  */
 require_once 'security/Security.php';
 require_once 'security/roles.php';
-session_start();
 
-Security::requireRole(ROLE_STUDENT);
+Security::getInstance()->requireRole(ROLE_STUDENT);
