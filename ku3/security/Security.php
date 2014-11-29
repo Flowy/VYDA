@@ -13,6 +13,7 @@ define('AUTH_SESSION_PARAM', 'auth');
 define('ORIGIN_PATH_SESSION_PARAM', 'originPath');
 
 include_once '../dbconfig.php';
+include_once 'roles.php';
 
 class Security {
 
@@ -20,8 +21,14 @@ class Security {
 
     private static function initProviders() {
         self::$authProviders = array();
-        self::$authProviders[] = new DatabaseAuthProvider();
-        self::$authProviders[] = new DatabaseAuthProvider();
+
+        $studentiConf = new DbAuthProviderConfig(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
+        $studentiConf->setTable('Studenti')->setLoginColumn('kod_studenta')->setPasswordColumn('heslo');
+        self::$authProviders[] = new DatabaseAuthProvider($studentiConf, ROLE_STUDENT);
+
+        $profesoriConf = new DbAuthProviderConfig(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
+        $profesoriConf->setTable('Pedagogove')->setLoginColumn('kod_pedagoga')->setPasswordColumn('heslo');
+        self::$authProviders[] = new DatabaseAuthProvider($profesoriConf, ROLE_PROFESOR);
     }
 
     public static function requireRole($role) {
@@ -62,8 +69,13 @@ class Security {
         die();
     }
 
-    private static function accessDenied() {
+    public static function accessDenied($message = null) {
         header("HTTP/1.1 403 Forbidden");
-        die("Access Forbidden");
+        $response = 'Access Forbidden';
+        if ($message) {
+            $response .= ': ' . $message;
+        }
+        die($response);
+
     }
 } 

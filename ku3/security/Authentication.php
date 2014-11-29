@@ -8,11 +8,19 @@
 
 class Authentication {
 
-    public function Authentication($username, $password) {
+    private $username;
+    private $role;
 
+    public function Authentication($username, $role) {
+        $this->username = $username;
+        $this->role = $role;
     }
 
     public function hasRole($role) {
-        return true;
+        return $role === $this->role;
+    }
+
+    public function getUsername() {
+        return $this->username;
     }
 } 
