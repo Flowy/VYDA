@@ -59,6 +59,11 @@ final class Security {
         } else {
             return true;
         }
+        return false;
+    }
+
+    public function getUsername() {
+        return $_SESSION[$this->AUTH_SESSION_PARAM]->getUsername();
     }
 
     public function login($username, $password) {
